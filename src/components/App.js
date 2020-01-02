@@ -14,11 +14,13 @@ class App extends Component{
       formDisplay: false,
       orderBy: 'petName',
       orderDir: 'asc',
+      queryText: 'chip',
       lastIndex: 0
     }
     this.deleteAppointment = this.deleteAppointment.bind(this);
     this.toggleForm = this.toggleForm.bind(this);
     this.addAppointment = this.addAppointment.bind(this);
+    this.changeOrder = this.changeOrder.bind(this);
   }
 
   toggleForm(){
@@ -44,6 +46,13 @@ class App extends Component{
     this.setState({
       myAppointments: tempApts
     })
+  }
+
+  changeOrder(order, dir){
+    this.setState({
+      orderBy: order,
+      orderDir: dir
+    });
   }
 
   //React lifecycle method
@@ -72,13 +81,20 @@ class App extends Component{
       order = -1;
     }
 
-    filteredApts.sort((a,b) =>{
+    filteredApts = filteredApts.sort((a, b) =>{
       if(a[this.state.orderBy].toLowerCase() < b[this.state.orderBy].toLowerCase()){
         return -1 * order;
       }else{
         return 1 * order;
       }
     })
+    .filter(eachItem => {
+      return(
+        eachItem['petName'].toLowerCase().includes(this.state.queryText.toLowerCase()) ||
+        eachItem['ownerName'].toLowerCase().includes(this.state.queryText.toLowerCase()) ||
+        eachItem['aptNotes'].toLowerCase().includes(this.state.queryText.toLowerCase())
+      )
+    });
 
     return (
       <main className="page bg-white" id="petratings">
@@ -92,8 +108,9 @@ class App extends Component{
                   addAppointment = {this.addAppointment}
                 />
                 <SearchAppointments 
-                  orderBy = {this.state.order}
+                  orderBy = {this.state.orderBy}
                   orderDir = {this.state.orderDir}
+                  changeOrder = {this.changeOrder}
                 />
                 <ListAppointments appointments={filteredApts} 
                   deleteAppointment={this.deleteAppointment} />
