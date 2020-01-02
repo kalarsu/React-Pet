@@ -3,7 +3,7 @@ import '../css/App.css';
 import AddAppointments from './AddAppointments';
 import ListAppointments from './ListAppointment';
 import SearchAppointments from './SearchAppointments';
-import {without} from 'lodash';
+import {findIndex, without} from 'lodash';
 
 class App extends Component{
   
@@ -14,13 +14,15 @@ class App extends Component{
       formDisplay: false,
       orderBy: 'petName',
       orderDir: 'asc',
-      queryText: 'chip',
+      queryText: '',
       lastIndex: 0
     }
     this.deleteAppointment = this.deleteAppointment.bind(this);
     this.toggleForm = this.toggleForm.bind(this);
     this.addAppointment = this.addAppointment.bind(this);
     this.changeOrder = this.changeOrder.bind(this);
+    this.searchApts = this.searchApts.bind(this);
+    this.updateInfo = this.updateInfo.bind(this);
   }
 
   toggleForm(){
@@ -53,6 +55,23 @@ class App extends Component{
       orderBy: order,
       orderDir: dir
     });
+  }
+
+  searchApts(query){
+    this.setState({
+      queryText: query
+    })
+  }
+
+  updateInfo(name, value, id){
+    let tempApts = this.state.myAppointments;
+    let aptIndex = findIndex(this.state.myAppointments, {
+      aptId: id
+    })
+    tempApts[aptIndex][name] = value;
+    this.setState({
+      myAppointments: tempApts
+    })
   }
 
   //React lifecycle method
@@ -111,9 +130,13 @@ class App extends Component{
                   orderBy = {this.state.orderBy}
                   orderDir = {this.state.orderDir}
                   changeOrder = {this.changeOrder}
+                  searchApts = {this.searchApts}
                 />
-                <ListAppointments appointments={filteredApts} 
-                  deleteAppointment={this.deleteAppointment} />
+                <ListAppointments 
+                  appointments={filteredApts} 
+                  deleteAppointment={this.deleteAppointment} 
+                  updateInfo = {this.updateInfo}
+                />
               </div>
             </div>
           </div>
